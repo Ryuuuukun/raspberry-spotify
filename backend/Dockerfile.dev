@@ -1,0 +1,15 @@
+FROM eclipse-temurin:25-jdk-alpine
+WORKDIR /app
+
+COPY mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
+COPY spotify-core/pom.xml spotify-core/
+COPY spotify-backend/pom.xml spotify-backend/
+COPY spotify-search-node/pom.xml spotify-search-node/
+
+RUN ./mvnw dependency:go-offline -B
+
+COPY . .
+
+CMD ["./mvnw", "clean", "verify"]

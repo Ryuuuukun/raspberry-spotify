@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+
+  spotify-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: spotify-backend-dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend:/app
+      - ~/.m2:/root/.m2
+    command: ./mvnw spring-boot:run -pl spotify-backend
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+
+  spotify-search-node:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: spotify-search-node-dev
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./backend:/app
+      - ~/.m2:/root/.m2
+    command: ./mvnw spring-boot:run -pl spotify-search-node
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+
+  spotify-frontend:
+    image: node:20-alpine
+    container_name: spotify-frontend-dev
+    working_dir: /app
+    ports:
+      - "5100:5100"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: sh -c "npm install && npm run dev"
+    environment:
+      - VITE_API_URL=http://localhost:8080
+      - VITE_SEARCH_URL=http://localhost:8081
