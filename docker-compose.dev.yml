@@ -43,3 +43,16 @@ services:
     environment:
       - VITE_API_URL=http://localhost:8080
       - VITE_SEARCH_URL=http://localhost:8081
+
+  keycloak:
+    image: keycloak/keycloak:26.7
+    container_name: keycloak-dev
+    command: start-dev
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+    ports:
+      - "8070:8080"
