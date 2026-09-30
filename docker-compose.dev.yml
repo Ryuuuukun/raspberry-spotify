@@ -2,6 +2,23 @@ version: '3.8'
 
 services:
 
+  postgres:
+    image: postgres:16
+    container_name: spotify-postgres-dev
+    environment:
+      POSTGRES_DB: spotify
+      POSTGRES_USER: spotify
+      POSTGRES_PASSWORD: spotify
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U spotify -d spotify"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   spotify-backend:
     build:
       context: ./backend
@@ -15,6 +32,12 @@ services:
     command: ./mvnw spring-boot:run -pl spotify-backend
     environment:
       - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/spotify
+      - SPRING_DATASOURCE_USERNAME=spotify
+      - SPRING_DATASOURCE_PASSWORD=spotify
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   spotify-search-node:
     build:
@@ -29,6 +52,12 @@ services:
     command: ./mvnw spring-boot:run -pl spotify-search-node
     environment:
       - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/spotify
+      - SPRING_DATASOURCE_USERNAME=spotify
+      - SPRING_DATASOURCE_PASSWORD=spotify
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   spotify-frontend:
     image: node:20-alpine
@@ -42,7 +71,7 @@ services:
     command: sh -c "npm install && npm run dev"
     environment:
       - VITE_API_URL=http://localhost:8080
-      - VITE_SEARCH_URL=http://localhost:8081
+      - VITE_SEARCH_URL=http://localhost:8090
 
   keycloak:
     image: keycloak/keycloak:26.7
@@ -63,3 +92,4 @@ services:
 
 volumes:
   keycloak_data:
+  postgres_data:
