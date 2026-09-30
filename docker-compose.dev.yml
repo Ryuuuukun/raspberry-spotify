@@ -47,12 +47,19 @@ services:
   keycloak:
     image: keycloak/keycloak:26.7
     container_name: keycloak-dev
-    command: start-dev
+    command: start-dev --import-realm
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HOSTNAME: "http://localhost:8070"
       KC_HTTP_ENABLED: "true"
       KC_HOSTNAME_STRICT: "false"
       KC_HOSTNAME_STRICT_HTTPS: "false"
+    volumes:
+        - ./keycloak:/opt/keycloak/data/import/:ro
+        - keycloak_data:/opt/keycloak/data/
     ports:
       - "8070:8080"
+
+volumes:
+  keycloak_data:
