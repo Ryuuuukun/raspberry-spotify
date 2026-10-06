@@ -1,11 +1,14 @@
 <script setup>
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { RouterView } from 'vue-router';
 
 
 </script>
 
 <template>
-    <RouterView>
+    <TooltipProvider>
+        <RouterView>
 
-    </RouterView>
+        </RouterView>
+    </TooltipProvider>
 </template>
