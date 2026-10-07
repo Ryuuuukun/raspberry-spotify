@@ -1,33 +1,34 @@
 <script setup>
-    import {
-        BellIcon, LayoutGridIcon,
-        LogOutIcon, Maximize2Icon,
-        MinusIcon, PlayIcon,
-        PlusIcon, RepeatIcon,
-        SearchIcon, SettingsIcon,
-        ShirtIcon, ShuffleIcon,
-        SkipBackIcon, SkipForwardIcon,
-        UserIcon, UserRoundIcon, UsersIcon
-    } from '@lucide/vue';
+import {
+    BellIcon, LayoutGridIcon,
+    LogOutIcon, Maximize2Icon,
+    MinusIcon, PlayIcon,
+    PlusIcon, RepeatIcon,
+    SearchIcon, SettingsIcon,
+    ShirtIcon, ShuffleIcon,
+    SkipBackIcon, SkipForwardIcon,
+    UserIcon, UserRoundIcon, UsersIcon
+} from '@lucide/vue';
 
-    import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuGroup, DropdownMenuItem, DropdownMenuShortcut } from '@/components/ui/dropdown-menu';
-    import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
-    import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
-    import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuGroup, DropdownMenuItem, DropdownMenuShortcut } from '@/components/ui/dropdown-menu';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
-    import { ScrollArea } from '@/components/ui/scroll-area';
-    import { Skeleton } from '@/components/ui/skeleton';
-    import { Slider } from '@/components/ui/slider';
-    import { Toggle } from '@/components/ui/toggle';
-    import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Slider } from '@/components/ui/slider';
+import { Toggle } from '@/components/ui/toggle';
+import { Button } from '@/components/ui/button';
 
+import { useAuthStore } from '../stores/auth.js';
+import { useRouter } from 'vue-router';
+import { ref } from 'vue';
 
-    import { useRouter } from 'vue-router';
-    import { ref } from 'vue';
+const isLibraryCollapsed = ref(false);
 
-    const isLibraryCollapsed = ref(false);
-
-    const router = useRouter();
+const router = useRouter();
+const authStore = useAuthStore();
 
 </script>
 
@@ -57,7 +58,7 @@
                             </DropdownMenuGroup>
                             <DropdownMenuLabel class="text-xs font-medium text-muted-foreground">Профиль</DropdownMenuLabel>
                             <DropdownMenuGroup>
-                                <DropdownMenuItem variant="destructive"><LogOutIcon/>Выйти</DropdownMenuItem>
+                                <DropdownMenuItem variant="destructive" @click="authStore.logout()"><LogOutIcon/>Выйти</DropdownMenuItem>
                             </DropdownMenuGroup>
                         </DropdownMenuContent>
                     </DropdownMenu>

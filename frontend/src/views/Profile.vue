@@ -1,8 +1,14 @@
 <script setup>
-    import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-    import { ScrollArea } from '@/components/ui/scroll-area';
-    import { Skeleton } from '@/components/ui/skeleton';
-    import { DotIcon, UserIcon } from '@lucide/vue';
+
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
+import { DotIcon, UserIcon } from '@lucide/vue';
+
+import { useAuthStore } from '../stores/auth.js';
+
+const authStore = useAuthStore();
+
 </script>
 
 <template>
@@ -17,7 +23,7 @@
                     </AvatarFallback>
                 </Avatar>
                 <div class="w-full h-full min-w-50">
-
+                    {{ authStore.user?.username }}
                 </div>
             </div>
         </ScrollArea>
