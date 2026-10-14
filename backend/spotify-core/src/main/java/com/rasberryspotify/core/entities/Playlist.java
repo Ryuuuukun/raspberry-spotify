@@ -35,6 +35,7 @@ public class Playlist {
     @Column(name = "cover_art", length = 512)
     private String coverArt;
 
+    @Builder.Default
     @Column(length = 50)
     private String visibility = "public";
 
