@@ -2,12 +2,10 @@ package com.rasberryspotify.core.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
+
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -37,10 +35,6 @@ public class Track {
     @Column(columnDefinition = "TEXT")
     private String lyrics;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "lyrics_synced", columnDefinition = "jsonb")
-    private String lyricsSynced;
-
     @Column(name = "duration_ms", nullable = false)
     private Integer durationMs;
 
@@ -55,25 +49,10 @@ public class Track {
     @JoinColumn(name = "uploaded_by")
     private User uploadedBy;
 
-    @ManyToMany
-    @JoinTable(
-            name = "track_genres",
-            joinColumns = @JoinColumn(name = "track_id"),
-            inverseJoinColumns = @JoinColumn(name = "genre_id")
-    )
-    private Set<Genre> genres;
-
     @Column(name = "created_at", insertable = false, updatable = false)
     private OffsetDateTime createdAt;
 
-    @OneToMany(mappedBy = "track", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<TrackArtist> artists;
+    @Column(name = "updated_at", insertable = false)
+    private OffsetDateTime updatedAt;
 
-    @ManyToMany
-    @JoinTable(
-            name = "track_tags",
-            joinColumns = @JoinColumn(name = "track_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
-    private Set<Tag> tags;
 }

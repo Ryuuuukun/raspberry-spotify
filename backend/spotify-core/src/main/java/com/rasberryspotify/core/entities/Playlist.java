@@ -38,20 +38,11 @@ public class Playlist {
     @Column(length = 50)
     private String visibility = "public";
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "source_playlist_id")
-    private Playlist sourcePlaylist;
-
     @Column(name = "created_at", insertable = false, updatable = false)
     private OffsetDateTime createdAt;
 
-    @ManyToMany
-    @JoinTable(
-            name = "playlist_tags",
-            joinColumns = @JoinColumn(name = "playlist_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
-    private Set<Tag> tags;
+    @Column(name = "updated_at", insertable = false)
+    private OffsetDateTime updatedAt;
 
     @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PlaylistTrack> tracks;
