@@ -4,7 +4,7 @@
       "name": "spotify-admin",
       "credentials": [
         {
-          "accessKey": "spotify_acces_key",
+          "accessKey": "spotify_access_key",
           "secretKey": "spotify_secret_key"
         }
       ],
