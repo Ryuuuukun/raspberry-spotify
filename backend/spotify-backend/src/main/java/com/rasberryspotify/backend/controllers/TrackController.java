@@ -9,7 +9,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URL;
+import java.time.Duration;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -28,18 +30,15 @@ public class TrackController {
         return ResponseEntity.ok(key);
     }
 
-    @GetMapping("/stream")
-    public ResponseEntity<StreamingResponseBody> stream(@RequestParam("key") String key) throws IOException{
-        InputStream in = storage.openStream(key);
-        StreamingResponseBody body = out -> {
-            try (in) {
-                in.transferTo(out);
-            }
-        };
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_TYPE, "audio/mpeg")
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline")
-                .body(body);
+    @GetMapping("/{id}/link")
+    public ResponseEntity<Map<String, String>> getStreamLink(@PathVariable UUID id) {
+        // Пока БД нет, формируем ключ "на лету" (как при загрузке)
+        // В будущем: достаем реальный ключ из БД по id трека
+        String key = "tracks/" + id + "/original.mp3";
 
+        URL presignedUrl = storage.generatePresignedUrl(key, Duration.ofMinutes(15));
+
+        return ResponseEntity.ok(Map.of("url", presignedUrl.toString()));
     }
 }
+

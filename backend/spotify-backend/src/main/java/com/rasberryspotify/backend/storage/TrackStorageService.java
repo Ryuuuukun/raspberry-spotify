@@ -6,6 +6,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.time.Duration;
 import java.util.UUID;
 
 @Service
@@ -28,8 +30,8 @@ public class TrackStorageService {
         return key;
     }
 
-    public InputStream openStream(String key) throws IOException {
-        return s3Template.download(properties.getBucket(), key).getInputStream();
+    public URL generatePresignedUrl(String key, Duration ttl) {
+        return s3Template.createSignedGetURL(properties.getBucket(), key, ttl);
     }
 
     public void delete(String key) {
