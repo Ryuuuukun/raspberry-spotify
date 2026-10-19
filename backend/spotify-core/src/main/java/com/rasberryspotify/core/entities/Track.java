@@ -43,7 +43,7 @@ public class Track {
 
     @Builder.Default
     @Column(name = "is_public")
-    private Boolean isPublic = true;
+    private Boolean isPublic = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "uploaded_by")
