@@ -17,8 +17,24 @@ const routes = [
                 meta: {
                     requiresAuth: true
                 }
+            },
+            {
+                path: '/playlist',
+                name: 'Playlist',
+                component: () => import('@/views/Playlist.vue'),
+                meta: {
+                    requiresAuth: true
+                }
             }
         ]
+    },
+    {
+        path: '/settings',
+        name: 'Settings',
+        component: () => import('@/views/Settings.vue'),
+        meta: {
+            requiresAuth: true
+        }
     }
 ];
 

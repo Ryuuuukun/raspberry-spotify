@@ -1,7 +1,9 @@
 <script setup>
+
 import {
     BellIcon, LayoutGridIcon,
     LogOutIcon, Maximize2Icon,
+    Minimize2Icon,
     MinusIcon, PlayIcon,
     PlusIcon, RepeatIcon,
     SearchIcon, SettingsIcon,
@@ -24,11 +26,15 @@ import { Button } from '@/components/ui/button';
 import { useAuthStore } from '../stores/auth.js';
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
+import Library from './Library.vue';
 
 const isLibraryCollapsed = ref(false);
 
 const router = useRouter();
 const authStore = useAuthStore();
+
+
+const expandedLibrary = ref(false);
 
 </script>
 
@@ -50,7 +56,9 @@ const authStore = useAuthStore();
                         <DropdownMenuContent class="w-50" align="start">
                             <DropdownMenuLabel class="text-xs font-medium text-muted-foreground">Основное</DropdownMenuLabel>
                             <DropdownMenuGroup>
-                                <DropdownMenuItem><UserIcon/>Аккаунт</DropdownMenuItem>
+                                <RouterLink to="/settings">
+                                    <DropdownMenuItem><UserIcon/>Аккаунт</DropdownMenuItem>
+                                </RouterLink>
                                 <RouterLink to="/profile">
                                     <DropdownMenuItem><ShirtIcon/>Профиль</DropdownMenuItem>
                                 </RouterLink>
@@ -104,28 +112,19 @@ const authStore = useAuthStore();
                         <Button variant="ghost" size="icon">
                             <PlusIcon/>
                         </Button>
-                        <Button variant="ghost" size="icon">
-                            <Maximize2Icon/>
+                        <Button variant="ghost" size="icon" @click="expandedLibrary = !expandedLibrary">
+                            <Maximize2Icon v-if="!expandedLibrary"/>
+                            <Minimize2Icon v-else/>
                         </Button>
                     </div>
-                    <ScrollArea class="w-full h-[calc(100%-4rem)]">
-                        <div class="flex flex-col gap-2 p-3">
-                            <div v-for="n in 20" class="flex gap-2">
-                                <Skeleton class="w-14 h-14"/>
-                                <div class="flex flex-col justify-center gap-2">
-                                    <Skeleton class="w-30 h-3"/>
-                                    <Skeleton class="w-25 h-3"/>
-                                </div>
-                            </div>
-                        </div>
-                    </ScrollArea>
+                    <Library
+                        :expanded="expandedLibrary"
+                    />
                 </div>
             </ResizablePanel>
             <ResizableHandle class="opacity-0"></ResizableHandle>
-            <ResizablePanel class="rounded-lg bg-background">
-                <RouterView>
-
-                </RouterView>
+            <ResizablePanel v-if="!expandedLibrary" class="rounded-lg bg-background">
+                <RouterView/>
             </ResizablePanel>
             <!-- <ResizableHandle class="opacity-0"></ResizableHandle> -->
             <!-- <ResizablePanel
