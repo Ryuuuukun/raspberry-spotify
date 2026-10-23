@@ -6,9 +6,9 @@ import com.rasberryspotify.core.dto.playlist.PlaylistResponse;
 import com.rasberryspotify.core.dto.playlist.PlaylistUpdateRequest;
 import com.rasberryspotify.core.services.PlaylistService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,12 +31,19 @@ public class PlaylistController {
                 .body(playlistService.create(userProvider.getCurrentUserId(), request));
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<PlaylistResponse> update(
             @PathVariable UUID id,
             @Valid @RequestBody PlaylistUpdateRequest request) {
 
         return ResponseEntity.ok(playlistService.update(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Boolean> delete(
+            @PathVariable UUID id) {
+
+        return ResponseEntity.ok(playlistService.delete(id));
     }
 
     @GetMapping("/{id}")
@@ -47,5 +54,10 @@ public class PlaylistController {
     @GetMapping("/owner")
     public ResponseEntity<List<PlaylistResponse>> getByOwner() {
         return ResponseEntity.ok(playlistService.getByOwner(userProvider.getCurrentUserId()));
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<PlaylistResponse>> getAll(Pageable pageable) {
+        return ResponseEntity.ok(playlistService.getAll(pageable));
     }
 }

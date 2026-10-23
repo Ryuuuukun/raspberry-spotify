@@ -9,6 +9,8 @@ import com.rasberryspotify.core.map.PlaylistMapper;
 import com.rasberryspotify.core.repositories.PlaylistRepository;
 import com.rasberryspotify.core.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.query.PreprocessedQuery;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +48,16 @@ public class PlaylistService {
         return playlistMapper.toResponse(playlistRepository.save(playlist));
     }
 
+    @Transactional
+    public Boolean delete(UUID playlistId) {
+        var exists = playlistRepository.existsById(playlistId);
+        if (exists) {
+            playlistRepository.deleteById(playlistId);
+        }
+
+        return exists;
+    }
+
     @Transactional(readOnly = true)
     public PlaylistResponse getById(UUID playlistId) {
         return playlistRepository.findById(playlistId)
@@ -56,5 +68,11 @@ public class PlaylistService {
     @Transactional(readOnly = true)
     public List<PlaylistResponse> getByOwner(UUID ownerId) {
         return playlistMapper.toResponses(playlistRepository.findAllByOwnerId(ownerId));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PlaylistResponse> getAll(Pageable pageable) {
+        return playlistRepository.findAll(pageable)
+                .map(playlistMapper::toResponse);
     }
 }
