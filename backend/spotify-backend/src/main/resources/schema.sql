@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    keycloak_id VARCHAR(255) UNIQUE NOT NULL,
+    keycloak_id UUID UNIQUE NOT NULL,
     username VARCHAR(255) UNIQUE NOT NULL,
     display_name VARCHAR(255),
     bio TEXT,

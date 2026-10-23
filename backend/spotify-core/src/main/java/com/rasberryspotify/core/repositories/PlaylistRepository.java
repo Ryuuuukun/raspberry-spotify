@@ -1,6 +1,6 @@
 package com.rasberryspotify.core.repositories;
 
-import com.rasberryspotify.core.entities.PlaylistTrack;
+import com.rasberryspotify.core.entities.Playlist;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -8,6 +8,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface PlaylistTrackRepo extends JpaRepository<PlaylistTrack, UUID> {
-    List<PlaylistTrack> findAllByPlaylistIdOrderByPositionAsc(UUID playlistId);
+public interface PlaylistRepository extends JpaRepository<Playlist, UUID> {
+    List<Playlist> findAllByOwnerId(UUID ownerId);
 }

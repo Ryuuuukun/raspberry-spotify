@@ -18,7 +18,6 @@ import java.util.UUID;
 @RequestMapping("/api/tracks")
 @RequiredArgsConstructor
 public class TrackController {
-
     private final TrackService trackService;
     private final CurrentUserProvider currentUser;
 

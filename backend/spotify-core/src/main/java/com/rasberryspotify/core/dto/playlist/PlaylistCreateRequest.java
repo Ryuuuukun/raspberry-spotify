@@ -29,6 +29,4 @@ public class PlaylistCreateRequest {
             message = "Visibility must be one of: public, private, unlisted"
     )
     private String visibility;
-
-    private Set<UUID> trackIds;
 }

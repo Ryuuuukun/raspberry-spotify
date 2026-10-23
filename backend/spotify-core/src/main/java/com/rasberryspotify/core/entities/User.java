@@ -22,7 +22,7 @@ public class User {
     private UUID id;
 
     @Column(name = "keycloak_id", unique = true, nullable = false)
-    private String keycloakId;
+    private UUID keycloakId;
 
     @Column(unique = true, nullable = false)
     private String username;
