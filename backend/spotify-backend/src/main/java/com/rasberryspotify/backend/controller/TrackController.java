@@ -18,28 +18,27 @@ import java.util.UUID;
 @RequestMapping("/api/tracks")
 @RequiredArgsConstructor
 public class TrackController {
-
     private final TrackService trackService;
-    private final CurrentUserProvider currentUser;
+    private final CurrentUserProvider userProvider;
 
     @PostMapping
     public ResponseEntity<TrackResponse> create(
             @Valid @RequestBody TrackCreateRequest request) {
         TrackResponse response = trackService.create(
-                currentUser.getCurrentUserId(), request);
+                userProvider.getCurrentUserId(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/my")
     public ResponseEntity<List<TrackResponse>> getMyTracks() {
         return ResponseEntity.ok(
-                trackService.getMyTracks(currentUser.getCurrentUserId()));
+                trackService.getMyTracks(userProvider.getCurrentUserId()));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<TrackResponse> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(
-                trackService.getById(id, currentUser.getCurrentUserId()));
+                trackService.getById(id, userProvider.getCurrentUserId()));
     }
 
 
@@ -48,12 +47,12 @@ public class TrackController {
             @PathVariable UUID id,
             @Valid @RequestBody TrackUpdateRequest request) {
         return ResponseEntity.ok(
-                trackService.update(id, currentUser.getCurrentUserId(), request));
+                trackService.update(id, userProvider.getCurrentUserId(), request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        trackService.delete(id, currentUser.getCurrentUserId());
+        trackService.delete(id, userProvider.getCurrentUserId());
         return ResponseEntity.noContent().build();
     }
 }
