@@ -40,10 +40,11 @@ public class PlaylistController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> delete(
+    public ResponseEntity<Void> delete(
             @PathVariable UUID id) {
 
-        return ResponseEntity.ok(playlistService.delete(id));
+        playlistService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")

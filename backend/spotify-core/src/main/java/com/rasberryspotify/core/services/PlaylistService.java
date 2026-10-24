@@ -49,13 +49,8 @@ public class PlaylistService {
     }
 
     @Transactional
-    public Boolean delete(UUID playlistId) {
-        var exists = playlistRepository.existsById(playlistId);
-        if (exists) {
-            playlistRepository.deleteById(playlistId);
-        }
-
-        return exists;
+    public void delete(UUID playlistId) {
+        playlistRepository.deleteById(playlistId);
     }
 
     @Transactional(readOnly = true)

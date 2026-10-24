@@ -10,7 +10,8 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import java.util.List;
 
 @Mapper(componentModel = "spring",
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        uses = { UserMapper.class })
 public interface PlaylistMapper {
     PlaylistResponse toResponse(Playlist playlist);
     List<PlaylistResponse> toResponses(List<Playlist> playlists);
