@@ -1,5 +1,7 @@
 package com.rasberryspotify.backend.security;
 
+import com.rasberryspotify.core.services.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -10,7 +12,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -18,12 +19,19 @@ import java.util.stream.Stream;
 
 @Component
 public class KeycloakRoleConverter implements Converter<Jwt, AbstractAuthenticationToken> {
-    private final JwtGrantedAuthoritiesConverter defaultAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+    private final JwtGrantedAuthoritiesConverter defaultAuthoritiesConverter;
+    private final UserService userService;
+
+    public KeycloakRoleConverter(UserService userService) {
+        this.defaultAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        this.userService = userService;
+    }
 
     @Override
     public AbstractAuthenticationToken convert(Jwt jwt) {
-        Collection<GrantedAuthority> authorities = this.defaultAuthoritiesConverter.convert(jwt);
+        this.userService.synchronizeUser(jwt);
 
+        Collection<GrantedAuthority> authorities = this.defaultAuthoritiesConverter.convert(jwt);
 
         Map<String, Object> accesses = jwt.getClaim("realm_access");
         if (accesses != null && accesses.containsKey("roles")) {
@@ -36,6 +44,7 @@ public class KeycloakRoleConverter implements Converter<Jwt, AbstractAuthenticat
         }
 
         String principalName = jwt.getClaimAsString("preferred_username");
-        return new JwtAuthenticationToken(jwt, authorities, principalName != null ? principalName : Objects.requireNonNull(jwt.getSubject()));
+        return new JwtAuthenticationToken(
+                jwt, authorities, principalName != null ? principalName : Objects.requireNonNull(jwt.getSubject()));
     }
 }
