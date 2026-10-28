@@ -30,6 +30,10 @@ public class TrackStorageService {
         return key;
     }
 
+    public URL generateUploadUrl(String key, Duration ttl) {
+        return s3Template.createSignedPutURL(properties.getBucket(), key, ttl);
+    }
+
     public URL generatePresignedUrl(String key, Duration ttl) {
         return s3Template.createSignedGetURL(properties.getBucket(), key, ttl);
     }

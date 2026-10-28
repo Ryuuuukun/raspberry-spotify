@@ -18,9 +18,9 @@ public class TrackCreateRequest {
     @Size(max = 255, message = "Title must be at most 255 characters")
     private String title;
 
-    @NotBlank(message = "Audio URL is required")
-    @Size(max = 512, message = "Audio URL must be at most 512 characters")
-    private String audioUrl;
+    @NotBlank(message = "File key is required")
+    @Size(max = 512, message = "File key must be at most 512 characters")
+    private String fileKey;
 
     @Size(max = 512, message = "Cover URL must be at most 512 characters")
     private String coverArt;
