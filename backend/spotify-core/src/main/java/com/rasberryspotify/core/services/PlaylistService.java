@@ -4,6 +4,7 @@ import com.rasberryspotify.core.dto.playlist.PlaylistCreateRequest;
 import com.rasberryspotify.core.dto.playlist.PlaylistResponse;
 import com.rasberryspotify.core.dto.playlist.PlaylistUpdateRequest;
 import com.rasberryspotify.core.entities.Playlist;
+import com.rasberryspotify.core.exception.AccessDeniedException;
 import com.rasberryspotify.core.exception.NotFoundException;
 import com.rasberryspotify.core.map.PlaylistMapper;
 import com.rasberryspotify.core.repositories.PlaylistRepository;
@@ -33,6 +34,7 @@ public class PlaylistService {
         var playlist = Playlist.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
+                .visibility(request.getVisibility())
                 .owner(owner)
                 .build();
 
@@ -40,17 +42,28 @@ public class PlaylistService {
     }
 
     @Transactional
-    public PlaylistResponse update(UUID playlistId, PlaylistUpdateRequest request) {
+    public PlaylistResponse update(UUID playlistId, UUID currentUserId, PlaylistUpdateRequest request) {
         var playlist = playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new NotFoundException("Playlist was not found."));
-        playlistMapper.updatePlaylistFromRequest(request, playlist);
 
+        if (!playlist.getOwner().getId().equals(currentUserId)) {
+            throw new AccessDeniedException("Only the owner can update this playlist");
+        }
+
+        playlistMapper.updatePlaylistFromRequest(request, playlist);
         return playlistMapper.toResponse(playlistRepository.save(playlist));
     }
 
     @Transactional
-    public void delete(UUID playlistId) {
-        playlistRepository.deleteById(playlistId);
+    public void delete(UUID playlistId, UUID currentUserId) {
+        var playlist = playlistRepository.findById(playlistId)
+                        .orElseThrow(() -> new NotFoundException("Playlist was not found."));
+
+        if (!playlist.getOwner().getId().equals(currentUserId)) {
+            throw new AccessDeniedException("Only the owner can delete this playlist");
+        }
+
+        playlistRepository.delete(playlist);
     }
 
     @Transactional(readOnly = true)

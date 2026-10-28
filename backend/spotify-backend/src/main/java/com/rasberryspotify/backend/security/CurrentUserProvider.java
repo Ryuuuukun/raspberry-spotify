@@ -25,7 +25,7 @@ public class CurrentUserProvider {
                 && jwt.getSubject() != null && !jwt.getSubject().isBlank()) {
 
             return userRepository.findByKeycloakId(UUID.fromString(jwt.getSubject()))
-                    .orElseThrow(() -> new NotFoundException("User wes not found."));
+                    .orElseThrow(() -> new NotFoundException("User was not found."));
         }
 
         throw new IllegalStateException("The user is not authenticated or the token is missing.");

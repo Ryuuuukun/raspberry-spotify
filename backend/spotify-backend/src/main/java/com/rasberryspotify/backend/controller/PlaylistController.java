@@ -36,14 +36,14 @@ public class PlaylistController {
             @PathVariable UUID id,
             @Valid @RequestBody PlaylistUpdateRequest request) {
 
-        return ResponseEntity.ok(playlistService.update(id, request));
+        return ResponseEntity.ok(playlistService.update(id, userProvider.getCurrentUserId(), request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @PathVariable UUID id) {
 
-        playlistService.delete(id);
+        playlistService.delete(id, userProvider.getCurrentUserId());
         return ResponseEntity.noContent().build();
     }
 
