@@ -16,7 +16,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final UserMapper userMap;
+    private final UserMapper userMaper;
 
     @Transactional
     public void synchronizeUser(Jwt jwt) {
@@ -54,14 +54,14 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserResponse getByKeycloakId(UUID id) {
         return userRepository.findByKeycloakId(id)
-                .map(userMap::toResponse)
+                .map(userMaper::toResponse)
                 .orElseThrow(() -> new NotFoundException("User not found: " + id));
     }
 
     @Transactional(readOnly = true)
     public UserResponse getById(UUID id) {
         return userRepository.findById(id)
-                .map(userMap::toResponse)
+                .map(userMaper::toResponse)
                 .orElseThrow(() -> new NotFoundException("User not found: " + id));
     }
 }

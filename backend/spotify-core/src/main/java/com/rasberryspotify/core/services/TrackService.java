@@ -31,7 +31,7 @@ public class TrackService {
 
         Track track = Track.builder()
                 .title(request.getTitle())
-                .audioUrl(request.getAudioUrl())
+                .audioUrl(request.getFileKey())
                 .coverArt(request.getCoverArt())
                 .durationMs(request.getDurationMs())
                 .releaseDate(request.getReleaseDate())
