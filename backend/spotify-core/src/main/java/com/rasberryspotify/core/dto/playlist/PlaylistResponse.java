@@ -1,5 +1,6 @@
 package com.rasberryspotify.core.dto.playlist;
 
+import com.rasberryspotify.core.dto.user.UserResponse;
 import lombok.*;
 
 import java.time.OffsetDateTime;
@@ -18,8 +19,7 @@ public class PlaylistResponse {
     private String coverArt;
     private String visibility;
 
-    private UUID ownerId;
-    private String ownerUsername;
+    private UserResponse owner;
 
     private List<PlaylistTrackResponse> tracks;
 
