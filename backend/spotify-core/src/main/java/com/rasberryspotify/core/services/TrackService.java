@@ -7,8 +7,8 @@ import com.rasberryspotify.core.entities.Track;
 import com.rasberryspotify.core.entities.User;
 import com.rasberryspotify.core.exception.AccessDeniedException;
 import com.rasberryspotify.core.exception.NotFoundException;
-import com.rasberryspotify.core.repositories.TrackRepo;
-import com.rasberryspotify.core.repositories.UserRepo;
+import com.rasberryspotify.core.repositories.TrackRepository;
+import com.rasberryspotify.core.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,8 +19,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class TrackService {
-    private final TrackRepo trackRepo;
-    private final UserRepo userRepo;
+    private final TrackRepository trackRepo;
+    private final UserRepository userRepo;
 
     @Transactional
     public TrackResponse create(UUID currentUserId, TrackCreateRequest request) {

@@ -15,14 +15,13 @@ import java.util.UUID;
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @EqualsAndHashCode.Include
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "keycloak_id", unique = true, nullable = false)
-    private String keycloakId;
+    private UUID keycloakId;
 
     @Column(unique = true, nullable = false)
     private String username;

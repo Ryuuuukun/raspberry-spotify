@@ -7,6 +7,8 @@ import com.rasberryspotify.core.dto.playlist.PlaylistUpdateRequest;
 import com.rasberryspotify.core.services.PlaylistService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,58 +20,45 @@ import java.util.UUID;
 @RequestMapping("/api/playlists")
 @RequiredArgsConstructor
 public class PlaylistController {
-
+    private final CurrentUserProvider userProvider;
     private final PlaylistService playlistService;
-    private final CurrentUserProvider currentUser;
 
     @PostMapping
     public ResponseEntity<PlaylistResponse> create(
             @Valid @RequestBody PlaylistCreateRequest request) {
-        PlaylistResponse response = playlistService.create(
-                currentUser.getCurrentUserId(), request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(playlistService.create(userProvider.getCurrentUserId(), request));
     }
 
-    @GetMapping("/owner/{ownerId}")
-    public ResponseEntity<List<PlaylistResponse>> getByOwner(@PathVariable UUID ownerId) {
-        return ResponseEntity.ok(
-                playlistService.getByOwner(ownerId, currentUser.getCurrentUserId()));
+    @PatchMapping("/{id}")
+    public ResponseEntity<PlaylistResponse> update(
+            @PathVariable UUID id,
+            @Valid @RequestBody PlaylistUpdateRequest request) {
+
+        return ResponseEntity.ok(playlistService.update(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(
+            @PathVariable UUID id) {
+
+        playlistService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PlaylistResponse> getById(@PathVariable UUID id) {
-        return ResponseEntity.ok(
-                playlistService.getById(id, currentUser.getCurrentUserId()));
+        return ResponseEntity.ok(playlistService.getById(id));
     }
 
-
-    @PutMapping("/{id}")
-    public ResponseEntity<PlaylistResponse> update(
-            @PathVariable UUID id,
-            @Valid @RequestBody PlaylistUpdateRequest request) {
-        return ResponseEntity.ok(
-                playlistService.update(id, currentUser.getCurrentUserId(), request));
+    @GetMapping("/owner")
+    public ResponseEntity<List<PlaylistResponse>> getByOwner() {
+        return ResponseEntity.ok(playlistService.getByOwner(userProvider.getCurrentUserId()));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        playlistService.delete(id, currentUser.getCurrentUserId());
-        return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/{id}/tracks/{trackId}")
-    public ResponseEntity<PlaylistResponse> addTrack(
-            @PathVariable UUID id,
-            @PathVariable UUID trackId) {
-        return ResponseEntity.ok(
-                playlistService.addTrack(id, trackId, currentUser.getCurrentUserId()));
-    }
-
-    @DeleteMapping("/{id}/tracks/{trackId}")
-    public ResponseEntity<PlaylistResponse> removeTrack(
-            @PathVariable UUID id,
-            @PathVariable UUID trackId) {
-        return ResponseEntity.ok(
-                playlistService.removeTrack(id, trackId, currentUser.getCurrentUserId()));
+    @GetMapping
+    public ResponseEntity<Page<PlaylistResponse>> getAll(Pageable pageable) {
+        return ResponseEntity.ok(playlistService.getAll(pageable));
     }
 }
