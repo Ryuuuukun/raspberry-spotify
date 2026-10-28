@@ -19,12 +19,12 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class TrackService {
-    private final TrackRepository trackRepo;
-    private final UserRepository userRepo;
+    private final TrackRepository trackRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public TrackResponse create(UUID currentUserId, TrackCreateRequest request) {
-        User uploader = userRepo.findById(currentUserId)
+        User uploader = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         Track track = Track.builder()
@@ -38,13 +38,13 @@ public class TrackService {
                 .uploadedBy(uploader)
                 .build();
 
-        trackRepo.save(track);
+        trackRepository.save(track);
         return toResponse(track);
     }
 
     @Transactional(readOnly = true)
     public TrackResponse getById(UUID trackId, UUID currentUserId) {
-        Track track = trackRepo.findById(trackId)
+        Track track = trackRepository.findById(trackId)
                 .orElseThrow(() -> new NotFoundException("Track not found: " + trackId));
 
         if (!Boolean.TRUE.equals(track.getIsPublic())
@@ -58,7 +58,7 @@ public class TrackService {
 
     @Transactional
     public TrackResponse update(UUID trackId, UUID currentUserId, TrackUpdateRequest request) {
-        Track track = trackRepo.findById(trackId)
+        Track track = trackRepository.findById(trackId)
                 .orElseThrow(() -> new NotFoundException("Track not found: " + trackId));
 
         if (track.getUploadedBy() == null
@@ -74,7 +74,7 @@ public class TrackService {
         if (request.getIsPublic() != null) track.setIsPublic(request.getIsPublic());
         if (request.getLyrics() != null) track.setLyrics(request.getLyrics());
 
-        trackRepo.save(track);
+        trackRepository.save(track);
         return toResponse(track);
     }
 
@@ -98,7 +98,7 @@ public class TrackService {
 
     @Transactional(readOnly = true)
     public List<TrackResponse> getMyTracks(UUID currentUserId) {
-        return trackRepo.findAllByUploadedById(currentUserId)
+        return trackRepository.findAllByUploadedById(currentUserId)
                 .stream()
                 .map(this::toResponse)
                 .toList();
@@ -106,7 +106,7 @@ public class TrackService {
 
     @Transactional
     public void delete(UUID trackId, UUID currentUserId) {
-        Track track = trackRepo.findById(trackId)
+        Track track = trackRepository.findById(trackId)
                 .orElseThrow(() -> new NotFoundException("Track not found: " + trackId));
 
         if (track.getUploadedBy() == null
@@ -114,6 +114,6 @@ public class TrackService {
             throw new AccessDeniedException("Only the owner can delete this track");
         }
 
-        trackRepo.delete(track);
+        trackRepository.delete(track);
     }
 }
