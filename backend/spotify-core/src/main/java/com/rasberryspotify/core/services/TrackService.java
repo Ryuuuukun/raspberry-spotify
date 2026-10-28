@@ -7,6 +7,7 @@ import com.rasberryspotify.core.entities.Track;
 import com.rasberryspotify.core.entities.User;
 import com.rasberryspotify.core.exception.AccessDeniedException;
 import com.rasberryspotify.core.exception.NotFoundException;
+import com.rasberryspotify.core.map.TrackMapper;
 import com.rasberryspotify.core.repositories.TrackRepository;
 import com.rasberryspotify.core.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import java.util.UUID;
 public class TrackService {
     private final TrackRepository trackRepository;
     private final UserRepository userRepository;
+    private final TrackMapper trackMapper;
 
     @Transactional
     public TrackResponse create(UUID currentUserId, TrackCreateRequest request) {
@@ -38,8 +40,7 @@ public class TrackService {
                 .uploadedBy(uploader)
                 .build();
 
-        trackRepository.save(track);
-        return toResponse(track);
+        return trackMapper.toResponse(trackRepository.save(track));
     }
 
     @Transactional(readOnly = true)
@@ -53,7 +54,7 @@ public class TrackService {
             throw new AccessDeniedException("This track is private");
         }
 
-        return toResponse(track);
+        return trackMapper.toResponse(track);
     }
 
     @Transactional
@@ -66,42 +67,15 @@ public class TrackService {
             throw new AccessDeniedException("Only the owner can update this track");
         }
 
-        if (request.getTitle() != null) track.setTitle(request.getTitle());
-        if (request.getAudioUrl() != null) track.setAudioUrl(request.getAudioUrl());
-        if (request.getCoverArt() != null) track.setCoverArt(request.getCoverArt());
-        if (request.getDurationMs() != null) track.setDurationMs(request.getDurationMs());
-        if (request.getReleaseDate() != null) track.setReleaseDate(request.getReleaseDate());
-        if (request.getIsPublic() != null) track.setIsPublic(request.getIsPublic());
-        if (request.getLyrics() != null) track.setLyrics(request.getLyrics());
+        trackMapper.updateTrackFromRequest(request, track);
 
-        trackRepository.save(track);
-        return toResponse(track);
+        return trackMapper.toResponse(trackRepository.save(track));
     }
 
-
-    private TrackResponse toResponse(Track track) {
-        return TrackResponse.builder()
-                .id(track.getId())
-                .title(track.getTitle())
-                .audioUrl(track.getAudioUrl())
-                .coverArt(track.getCoverArt())
-                .durationMs(track.getDurationMs())
-                .releaseDate(track.getReleaseDate())
-                .isPublic(track.getIsPublic())
-                .lyrics(track.getLyrics())
-                .uploadedById(track.getUploadedBy() != null ? track.getUploadedBy().getId() : null)
-                .uploadedByUsername(track.getUploadedBy() != null ? track.getUploadedBy().getUsername() : null)
-                .createdAt(track.getCreatedAt())
-                .updatedAt(track.getUpdatedAt())
-                .build();
-    }
 
     @Transactional(readOnly = true)
     public List<TrackResponse> getMyTracks(UUID currentUserId) {
-        return trackRepository.findAllByUploadedById(currentUserId)
-                .stream()
-                .map(this::toResponse)
-                .toList();
+        return trackMapper.toResponses(trackRepository.findAllByUploadedById(currentUserId));
     }
 
     @Transactional
