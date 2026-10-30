@@ -12,16 +12,16 @@ const routes = [
         children: [
             {
                 path: '/profile',
-                name: 'profile',
+                name: 'Profile',
                 component: () => import('@/views/Profile.vue'),
                 meta: {
                     requiresAuth: true
                 }
             },
             {
-                path: '/playlist',
+                path: '/playlist/:id',
                 name: 'Playlist',
-                component: () => import('@/views/Playlist.vue'),
+                component: () => import('@/pages/Playlist.vue'),
                 meta: {
                     requiresAuth: true
                 }

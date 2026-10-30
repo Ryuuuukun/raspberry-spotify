@@ -7,19 +7,48 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 
-import { ref } from 'vue';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
+
+import {
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form';
+
+import { Input } from '@/components/ui/input';
+
+import UpdatePlaylistDialog from '@/components/block/dialog/UpdatePlaylistDialog.vue';
+
+import { onMounted, ref } from 'vue';
 import { ScrollAreaScrollbar } from 'reka-ui';
 
-const playlist = ref({
-    id: 0,
-    title: 'Мой плейлист',
-    type: 'public',
-    owner: {
-        nickname: 'Shouryuuko'
-    },
-    tracks: Array.from({ length: 100 }, (_, k) => ({ id: k, duration: k ** 2 }))
-});
+import { usePlaylists } from '@/api/services/playlists.js';
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
+const playlists = usePlaylists();
+
+const playlist = ref({});
+
+onMounted(async () => {
+    console.log(route.params.id);
+    try {
+        playlist.value = await playlists.get(route.params.id);
+        console.log(playlist.value);
+    } catch (e) {
+        console.log(e);
+    }
+});
 
 const SortType = [
     { label: 'Название', value: 'title' },
@@ -27,7 +56,6 @@ const SortType = [
 ];
 
 const currentSortType = ref(SortType[0]);
-
 </script>
 
 <template>
@@ -35,27 +63,24 @@ const currentSortType = ref(SortType[0]);
         <!-- banner -->
         <div class="w-full flex items-end space-x-5 p-10">
             <div class="z-10">
-                <Skeleton class="w-[20cqw] min-w-30 max-w-60 aspect-square"/>
+                <Skeleton class="w-[20cqw] min-w-30 max-w-56 aspect-square"/>
             </div>
             <div class="z-10">
                 <p class="text-muted-foreground text-sm">
                     {{
-                        {
-                            'public': 'Открытый плейлист',
-                            'private': 'Приватный плейлист'
-                        }[playlist?.type]
+                        playlist.visibility ? 'Открытый плейлист' : 'Закрытый плейлист'
                     }}
                 </p>
-                <p class="font-black text-4xl sm:text-4xl md:text-6xl lg:text-6xl xl:text-8xl">Мой плейлист</p>
+                <p class="font-black text-4xl sm:text-4xl md:text-6xl lg:text-6xl xl:text-8xl">{{ playlist.title }}</p>
                 <div class="flex items-center space-x-1 text-sm font-medium">
                     <Avatar class="size-6">
                         <AvatarFallback><UserIcon class="size-4"/></AvatarFallback>
                     </Avatar>
                     <Button variant="link" class="p-0">
-                        <p class="font-bold">{{ playlist?.owner?.nickname }}</p>
+                        <p class="font-bold">{{ playlist.owner?.displayName || playlist.owner?.username }}</p>
                     </Button>
-                    <p class="text-muted-foreground font-normal">&bull;</p>
-                    <p class="text-muted-foreground font-normal">
+                    <!-- <p class="text-muted-foreground font-normal">&bull;</p> -->
+                    <!-- <p class="text-muted-foreground font-normal">
                         {{ playlist?.tracks.length }} треков,
                         {{
                             ((tracks, time = tracks.reduce((s, e) => s + e.duration, 0)) => {
@@ -66,7 +91,7 @@ const currentSortType = ref(SortType[0]);
                                 return (hours > 0 ? `${hours} ч. ` : '') + (minutes > 0 ? `${minutes} мин. ` : '') + `${seconds} сек.`
                             })(playlist.tracks)
                         }}
-                    </p>
+                    </p> -->
                 </div>
             </div>
         </div>
@@ -88,22 +113,12 @@ const currentSortType = ref(SortType[0]);
                     <PlusIcon/>
                     <p>Добавить</p>
                 </Button>
-                <Button variant="secondary" class="rounded-full">
-                    <PenIcon/>
-                    <p>Название и сведения</p>
-                </Button>
-                <div class="w-full"></div>
-                <DropdownMenu>
-                    <DropdownMenuTrigger>
-                        <Button variant="ghost" class="text-muted-foreground rounded-full">
-                            <p>{{ currentSortType.label }}</p>
-                            <!-- <TextAlignJustifyIcon/> -->
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <UpdatePlaylistDialog :item="playlist">
+                    <Button variant="secondary" class="rounded-full">
+                        <PenIcon/>
+                        <p>Название и сведения</p>
+                    </Button>
+                </UpdatePlaylistDialog>
             </div>
         </div>
         <!-- content -->

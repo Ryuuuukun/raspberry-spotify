@@ -66,6 +66,12 @@ public class PlaylistService {
     }
 
     @Transactional(readOnly = true)
+    public Page<PlaylistResponse> getByOwner(UUID ownerId, Pageable pageable) {
+        return playlistRepository.findAllByOwnerId(ownerId, pageable)
+                .map(playlistMapper::toResponse);
+    }
+
+    @Transactional(readOnly = true)
     public Page<PlaylistResponse> getAll(Pageable pageable) {
         return playlistRepository.findAll(pageable)
                 .map(playlistMapper::toResponse);

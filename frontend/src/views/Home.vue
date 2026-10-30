@@ -1,10 +1,10 @@
 <script setup>
-
 import {
     BellIcon, LayoutGridIcon,
+    LibraryIcon,
     LogOutIcon, Maximize2Icon,
     Minimize2Icon,
-    MinusIcon, PlayIcon,
+    MinusIcon, Music2Icon, Music3Icon, MusicIcon, PlayIcon,
     PlusIcon, RepeatIcon,
     SearchIcon, SettingsIcon,
     ShirtIcon, ShuffleIcon,
@@ -23,19 +23,38 @@ import { Slider } from '@/components/ui/slider';
 import { Toggle } from '@/components/ui/toggle';
 import { Button } from '@/components/ui/button';
 
+import Library from './Library.vue';
+
 import { useAuthStore } from '../stores/auth.js';
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
-import Library from './Library.vue';
+import { useMounted } from '@vueuse/core';
+import backendClient from '@/api/axios.js';
+import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from '@/components/ui/context-menu/index.js';
 
-const isLibraryCollapsed = ref(false);
+import { usePlaylists } from '@/api/services/playlists.js';
+import { useLibrary } from '@/composable/useLibrary.js';
 
 const router = useRouter();
 const authStore = useAuthStore();
+const playlists = usePlaylists();
+const library = useLibrary();
 
-
+const isLibraryCollapsed = ref(false);
 const expandedLibrary = ref(false);
 
+async function handleCreatePlaylist() {
+    const playlistCreateRequest = {
+        title: 'Новый плейлист'
+    };
+
+    try {
+        await playlists.create(playlistCreateRequest);
+        await library.load(true);
+    } catch (e) {
+        console.log(e);
+    }
+}
 </script>
 
 <template>
@@ -98,6 +117,15 @@ const expandedLibrary = ref(false);
                 <!-- Library -->
                 <div v-if="isLibraryCollapsed" class="w-full h-full">
                     <ScrollArea class="w-full flex-1 min-h-0">
+                        <div class="w-20 h-16 px-5 flex items-center">
+                            <Button
+                                variant="ghost"
+                                size="icon-lg"
+                                class="rounded-full pl-0.5"
+                            >
+                                <LibraryIcon class="size-6"/>
+                            </Button>
+                        </div>
                         <div class="flex flex-col gap-2 p-3">
                             <Skeleton
                                 v-for="n in 14"
@@ -107,19 +135,28 @@ const expandedLibrary = ref(false);
                     </ScrollArea>
                 </div>
                 <div v-else class="w-full h-full">
-                    <div class="w-full h-16 flex gap-2 p-4">
-                        <p class="w-full text-lg font-semibold">Моя медиатека</p>
-                        <Button variant="ghost" size="icon">
-                            <PlusIcon/>
-                        </Button>
-                        <Button variant="ghost" size="icon" @click="expandedLibrary = !expandedLibrary">
+                    <div class="w-full h-16 px-4 flex items-center justify-between">
+                        <div class="space-x-2 flex items-center">
+                            <Button
+                                variant="ghost"
+                                size="icon-lg"
+                                class="rounded-full pl-0.5"
+                            >
+                                <LibraryIcon class="size-6"/>
+                            </Button>
+                            <p class="font-bold">Моя медиатека</p>
+                        </div>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            class="rounded-full"
+                            @click="expandedLibrary = !expandedLibrary"
+                        >
                             <Maximize2Icon v-if="!expandedLibrary"/>
                             <Minimize2Icon v-else/>
                         </Button>
                     </div>
-                    <Library
-                        :expanded="expandedLibrary"
-                    />
+                    <Library :expanded="expandedLibrary"/>
                 </div>
             </ResizablePanel>
             <ResizableHandle class="opacity-0"></ResizableHandle>

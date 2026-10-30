@@ -53,8 +53,8 @@ public class PlaylistController {
     }
 
     @GetMapping("/owner")
-    public ResponseEntity<List<PlaylistResponse>> getByOwner() {
-        return ResponseEntity.ok(playlistService.getByOwner(userProvider.getCurrentUserId()));
+    public ResponseEntity<Page<PlaylistResponse>> getByOwner(Pageable pageable) {
+        return ResponseEntity.ok(playlistService.getByOwner(userProvider.getCurrentUserId(), pageable));
     }
 
     @GetMapping
