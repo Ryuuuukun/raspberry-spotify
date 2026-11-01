@@ -3,9 +3,10 @@ import { EllipsisIcon, PenIcon, PlayIcon, PlusIcon, ShuffleIcon, TextAlignJustif
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+
+import ScrollArea from '@/components/ui/scroll-area/ScrollArea.vue';
 
 import {
     Dialog,
@@ -29,7 +30,7 @@ import { Input } from '@/components/ui/input';
 
 import UpdatePlaylistDialog from '@/components/block/dialog/UpdatePlaylistDialog.vue';
 
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { ScrollAreaScrollbar } from 'reka-ui';
 
 import { usePlaylists } from '@/api/services/playlists.js';
@@ -40,15 +41,8 @@ const playlists = usePlaylists();
 
 const playlist = ref({});
 
-onMounted(async () => {
-    console.log(route.params.id);
-    try {
-        playlist.value = await playlists.get(route.params.id);
-        console.log(playlist.value);
-    } catch (e) {
-        console.log(e);
-    }
-});
+watch(() => route.params.id, reload);
+onMounted(() => reload(route.params.id));
 
 const SortType = [
     { label: 'Название', value: 'title' },
@@ -56,6 +50,14 @@ const SortType = [
 ];
 
 const currentSortType = ref(SortType[0]);
+
+async function reload(id) {
+    try {
+        playlist.value = await playlists.get(id);
+    } catch (e) {
+        throw e;
+    }
+}
 </script>
 
 <template>

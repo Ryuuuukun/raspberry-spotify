@@ -27,7 +27,7 @@ async function handleDeletePlaylist() {
 <template>
     <ContextMenu>
         <ContextMenuTrigger>
-            <RouterLink to="/playlist">
+            <RouterLink :to="{ name: 'Playlist', params: { id: item.id } }">
                 <slot/>
             </RouterLink>
         </ContextMenuTrigger>

@@ -1,7 +1,6 @@
 <script setup>
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DotIcon, PenIcon, Settings2Icon, SettingsIcon, UserIcon } from '@lucide/vue';
 
@@ -15,8 +14,8 @@ const authStore = useAuthStore();
 </script>
 
 <template>
-    <ScrollArea class="w-full h-full">
-        <!-- banner -->
+    <!-- <ScrollArea class="w-full h-full">
+         banner
         <div class="@container w-full flex space-x-5 items-end p-5">
             <Avatar class="w-[20cqw] h-[20cqw] min-w-30 min-h-30 max-w-50 max-h-50">
                 <AvatarImage/>
@@ -49,7 +48,7 @@ const authStore = useAuthStore();
                 Настроить витрину
             </Button>
         </div>
-    </ScrollArea>
+    </ScrollArea> -->
 
     <!-- <div class="w-full h-full flex flex-col">
         <ScrollArea class="w-full h-full">

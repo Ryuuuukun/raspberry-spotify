@@ -17,13 +17,10 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/componen
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Slider } from '@/components/ui/slider';
 import { Toggle } from '@/components/ui/toggle';
 import { Button } from '@/components/ui/button';
-
-import Library from './Library.vue';
 
 import { useAuthStore } from '../stores/auth.js';
 import { useRouter } from 'vue-router';
@@ -34,6 +31,8 @@ import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from '@/component
 
 import { usePlaylists } from '@/api/services/playlists.js';
 import { useLibrary } from '@/composable/useLibrary.js';
+
+import LibraryView from './LibraryView.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -114,50 +113,10 @@ async function handleCreatePlaylist() {
                 @collapse="isLibraryCollapsed = true"
                 @expand="isLibraryCollapsed = false"
             >
-                <!-- Library -->
-                <div v-if="isLibraryCollapsed" class="w-full h-full">
-                    <ScrollArea class="w-full flex-1 min-h-0">
-                        <div class="w-20 h-16 px-5 flex items-center">
-                            <Button
-                                variant="ghost"
-                                size="icon-lg"
-                                class="rounded-full pl-0.5"
-                            >
-                                <LibraryIcon class="size-6"/>
-                            </Button>
-                        </div>
-                        <div class="flex flex-col gap-2 p-3">
-                            <Skeleton
-                                v-for="n in 14"
-                                class="aspect-square w-full"
-                            />
-                        </div>
-                    </ScrollArea>
-                </div>
-                <div v-else class="w-full h-full">
-                    <div class="w-full h-16 px-4 flex items-center justify-between">
-                        <div class="space-x-2 flex items-center">
-                            <Button
-                                variant="ghost"
-                                size="icon-lg"
-                                class="rounded-full pl-0.5"
-                            >
-                                <LibraryIcon class="size-6"/>
-                            </Button>
-                            <p class="font-bold">Моя медиатека</p>
-                        </div>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            class="rounded-full"
-                            @click="expandedLibrary = !expandedLibrary"
-                        >
-                            <Maximize2Icon v-if="!expandedLibrary"/>
-                            <Minimize2Icon v-else/>
-                        </Button>
-                    </div>
-                    <Library :expanded="expandedLibrary"/>
-                </div>
+                <LibraryView
+                    :collapsed="isLibraryCollapsed"
+                    @expand="expandedLibrary = !expandedLibrary"
+                />
             </ResizablePanel>
             <ResizableHandle class="opacity-0"></ResizableHandle>
             <ResizablePanel v-if="!expandedLibrary" class="rounded-lg bg-background">
