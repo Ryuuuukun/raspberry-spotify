@@ -27,11 +27,9 @@ import { toTypedSchema } from '@vee-validate/zod';
 import * as z from 'zod';
 
 import { usePlaylists } from '@/api/services/playlists.js';
-import { useLibrary } from '@/composable/useLibrary.js';
 
 const isOpen = ref(false);
 
-const library = useLibrary();
 const playlists = usePlaylists();
 const props = defineProps({
     item: {
@@ -71,7 +69,6 @@ watch(() => props.item, (newitem) => {
 const onSumbit = form.handleSubmit(async (values) => {
     try {
         await playlists.update(props.item?.id, values);
-        await library.load(true);
         isOpen.value = false;
     } catch (e) {
         console.error(e);

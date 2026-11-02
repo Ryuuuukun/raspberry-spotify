@@ -2,11 +2,9 @@
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { GitPullRequestCreateArrowIcon, LockIcon, Music2Icon, PenIcon, ShareIcon, TrashIcon } from '@lucide/vue';
 
-import { useLibrary } from '@/composable/useLibrary.js';
 import { usePlaylists } from '@/api/services/playlists.js';
 
 const playlists = usePlaylists();
-const library = useLibrary();
 
 const props = defineProps({
     item: {
@@ -17,7 +15,6 @@ const props = defineProps({
 async function handleDeletePlaylist() {
     try {
         await playlists.remove(props.item.id);
-        await library.load(true);
     } catch (e) {
         console.log(e);
     }

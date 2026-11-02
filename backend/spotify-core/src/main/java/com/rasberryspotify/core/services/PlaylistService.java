@@ -6,12 +6,15 @@ import com.rasberryspotify.core.dto.playlist.PlaylistUpdateRequest;
 import com.rasberryspotify.core.entities.Playlist;
 import com.rasberryspotify.core.exception.NotFoundException;
 import com.rasberryspotify.core.map.PlaylistMapper;
+import com.rasberryspotify.core.provider.CurrentUserProvider;
+import com.rasberryspotify.core.realtime.DeliveryEvent;
+import com.rasberryspotify.core.realtime.DeliveryEventPublisher;
+import com.rasberryspotify.core.realtime.DeliveryEventTarget;
 import com.rasberryspotify.core.repositories.PlaylistRepository;
 import com.rasberryspotify.core.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.query.PreprocessedQuery;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +27,9 @@ public class PlaylistService {
     private final UserRepository userRepository;
     private final PlaylistRepository playlistRepository;
 
+    private final DeliveryEventPublisher eventPublisher;
+    private final CurrentUserProvider currentUserProvider;
+
     private final PlaylistMapper playlistMapper;
 
     @Transactional
@@ -35,6 +41,14 @@ public class PlaylistService {
                 .description(request.getDescription())
                 .owner(owner)
                 .build();
+        eventPublisher.publish(
+                DeliveryEventTarget.user(
+                        currentUserProvider.getCurrentKeycloakId().toString(),
+                        "/queue/library"
+                ),
+                DeliveryEvent.builder()
+                        .type(DeliveryEvent.Type.LIBRARY_UPDATE).build()
+        );
 
         return playlistMapper.toResponse(playlistRepository.save(playlist));
     }
@@ -44,6 +58,14 @@ public class PlaylistService {
         var playlist = playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new NotFoundException("Playlist was not found."));
         playlistMapper.updatePlaylistFromRequest(request, playlist);
+        eventPublisher.publish(
+                DeliveryEventTarget.user(
+                        currentUserProvider.getCurrentKeycloakId().toString(),
+                        "/queue/library"
+                ),
+                DeliveryEvent.builder()
+                        .type(DeliveryEvent.Type.LIBRARY_UPDATE).build()
+        );
 
         return playlistMapper.toResponse(playlistRepository.save(playlist));
     }
@@ -51,6 +73,14 @@ public class PlaylistService {
     @Transactional
     public void delete(UUID playlistId) {
         playlistRepository.deleteById(playlistId);
+        eventPublisher.publish(
+                DeliveryEventTarget.user(
+                        currentUserProvider.getCurrentKeycloakId().toString(),
+                        "/queue/library"
+                ),
+                DeliveryEvent.builder()
+                        .type(DeliveryEvent.Type.LIBRARY_UPDATE).build()
+        );
     }
 
     @Transactional(readOnly = true)

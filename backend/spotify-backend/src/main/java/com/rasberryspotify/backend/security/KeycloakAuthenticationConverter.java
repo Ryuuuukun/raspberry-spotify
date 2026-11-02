@@ -1,7 +1,6 @@
 package com.rasberryspotify.backend.security;
 
 import com.rasberryspotify.core.services.UserService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,11 +17,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
-public class KeycloakRoleConverter implements Converter<Jwt, AbstractAuthenticationToken> {
+public class KeycloakAuthenticationConverter implements Converter<Jwt, AbstractAuthenticationToken> {
     private final JwtGrantedAuthoritiesConverter defaultAuthoritiesConverter;
     private final UserService userService;
 
-    public KeycloakRoleConverter(UserService userService) {
+    public KeycloakAuthenticationConverter(UserService userService) {
         this.defaultAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         this.userService = userService;
     }
@@ -43,8 +42,7 @@ public class KeycloakRoleConverter implements Converter<Jwt, AbstractAuthenticat
                     .collect(Collectors.toSet());
         }
 
-        String principalName = jwt.getClaimAsString("preferred_username");
-        return new JwtAuthenticationToken(
-                jwt, authorities, principalName != null ? principalName : Objects.requireNonNull(jwt.getSubject()));
+        String principalName = jwt.getSubject();
+        return new JwtAuthenticationToken(jwt, authorities, Objects.requireNonNull(principalName));
     }
 }

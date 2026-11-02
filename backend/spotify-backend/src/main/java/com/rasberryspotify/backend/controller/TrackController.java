@@ -1,6 +1,6 @@
 package com.rasberryspotify.backend.controller;
 
-import com.rasberryspotify.backend.security.CurrentUserProvider;
+import com.rasberryspotify.core.provider.CurrentUserProvider;
 import com.rasberryspotify.core.dto.track.TrackCreateRequest;
 import com.rasberryspotify.core.dto.track.TrackResponse;
 import com.rasberryspotify.core.dto.track.TrackUpdateRequest;

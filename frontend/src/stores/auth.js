@@ -16,6 +16,7 @@ export const useAuthStore = defineStore('auth', {
                 clientId: 'raspberry-frontend'
             });
 
+            instance.updateToken = instance.updateToken.bind(instance);
             instance.onTokenExpired = async () => {
                 try {
                     const refreshed = await instance.updateToken(30);

@@ -24,20 +24,18 @@ import { Button } from '@/components/ui/button';
 
 import { useAuthStore } from '../stores/auth.js';
 import { useRouter } from 'vue-router';
-import { ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import { useMounted } from '@vueuse/core';
 import backendClient from '@/api/axios.js';
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from '@/components/ui/context-menu/index.js';
 
 import { usePlaylists } from '@/api/services/playlists.js';
-import { useLibrary } from '@/composable/useLibrary.js';
 
 import LibraryView from './LibraryView.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
 const playlists = usePlaylists();
-const library = useLibrary();
 
 const isLibraryCollapsed = ref(false);
 const expandedLibrary = ref(false);

@@ -1,5 +1,6 @@
 <script setup>
 import LibraryPlaylistContext from '@/components/subcomp/library/LibraryPlaylistContext.vue';
+import LibraryCreateContext from '@/components/subcomp/library/LibraryCreateContext.vue';
 import LibrarySelectView from '@/components/subcomp/library/LibrarySelectView.vue';
 
 import PlaylistSplashCard from '@/components/block/playlist/PlaylistSplashCard.vue';
@@ -11,11 +12,12 @@ import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '
 import ScrollArea from '@/components/ui/scroll-area/ScrollArea.vue';
 import { Button } from '@/components/ui/button';
 
-import { useLibrary } from '@/composable/useLibrary.js';
-import { computed, onMounted, ref } from 'vue';
-import LibraryCreateContext from '@/components/subcomp/library/LibraryCreateContext.vue';
+import { useLibraryStore } from '@/stores/library.js';
+import { useLibrarySynchronize } from '@/composable/useLibrarySynchronize.js';
+import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue';
 
-const library = useLibrary();
+const libraryStore = useLibraryStore();
+const librarySynchronize = useLibrarySynchronize();
 
 const props = defineProps({
     collapsed: {
@@ -56,20 +58,26 @@ function clearSearch() {
 // sorting/view
 const viewOptions = {
     sorts: [
-        { label: 'Недавние' },
-        { label: 'По алфавиту' },
-        { label: 'Автор' }
+        { label: 'Недавние', value: 'createdAt' },
+        { label: 'По алфавиту', value: 'title' },
     ],
     views: [
-        { type: 'short', icon: TextAlignJustifyIcon, component: PlaylistShortCard },
-        { type: 'list', icon: ListIcon, component: PlaylistSplashCard },
-        { type: 'grid', icon: Grid2X2Icon, component: PlaylistCoverCard }
+        { type: 'short', icon: TextAlignJustifyIcon },
+        { type: 'list', icon: ListIcon },
+        { type: 'grid', icon: Grid2X2Icon }
     ]
 };
 const viewModel = ref({
     order: 'asc',
     sort: viewOptions.sorts[0],
     view: viewOptions.views[1]
+});
+
+watch(() => viewModel.value.sort, async (value) => {
+    await libraryStore.changeSort(viewModel.value.sort.value, viewModel.value.order);
+});
+watch(() => viewModel.value.order, async (value) => {
+    await libraryStore.changeSort(viewModel.value.sort.value, viewModel.value.order);
 });
 
 // list card
@@ -83,7 +91,12 @@ const libraryCard = computed(() => {
 
 // mounted/unmounted
 onMounted(async () => {
-    await library.load();
+    await libraryStore.loadPage();
+    await librarySynchronize.init();
+});
+
+onUnmounted(() => {
+    librarySynchronize.destroy();
 });
 </script>
 
@@ -177,16 +190,24 @@ onMounted(async () => {
                 </div>
             </Transition>
         </div>
-        <ScrollArea class="flex-1 px-2" @update="library.load">
+        <ScrollArea class="flex-1 px-2" @update="libraryStore.nextPage">
             <div :class="{
                 'grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))]': !collapsed && viewModel.view.type === 'grid'
             }">
                 <LibraryPlaylistContext
-                    v-for="item in library.items.value"
+                    v-for="item in libraryStore.items"
                     :item="item"
                 >
-                    <component
-                        :is="libraryCard"
+                    <PlaylistCoverCard
+                        v-if="collapsed || viewModel.view.type === 'grid'"
+                        :item="item"
+                    />
+                    <PlaylistShortCard
+                        v-else-if="!collapsed && viewModel.view.type === 'short'"
+                        :item="item"
+                    />
+                    <PlaylistSplashCard
+                        v-else-if="!collapsed && viewModel.view.type === 'list'"
                         :item="item"
                     />
                 </LibraryPlaylistContext>

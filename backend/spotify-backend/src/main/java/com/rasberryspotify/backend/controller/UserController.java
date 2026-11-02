@@ -1,6 +1,6 @@
 package com.rasberryspotify.backend.controller;
 
-import com.rasberryspotify.backend.security.CurrentUserProvider;
+import com.rasberryspotify.core.provider.CurrentUserProvider;
 import com.rasberryspotify.core.dto.user.UserResponse;
 import com.rasberryspotify.core.map.UserMapper;
 import com.rasberryspotify.core.services.UserService;

@@ -1,6 +1,6 @@
 package com.rasberryspotify.backend.controller;
 
-import com.rasberryspotify.backend.security.CurrentUserProvider;
+import com.rasberryspotify.core.provider.CurrentUserProvider;
 import com.rasberryspotify.core.dto.playlist.PlaylistCreateRequest;
 import com.rasberryspotify.core.dto.playlist.PlaylistResponse;
 import com.rasberryspotify.core.dto.playlist.PlaylistUpdateRequest;
@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
