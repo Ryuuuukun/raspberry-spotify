@@ -7,11 +7,15 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "spring.cloud.aws.s3")
 public class StorageProperties {
     private String bucket;
-    public String getBucket(){
-        return bucket;
-    }
+    private String publicEndpoint;
+    private boolean pathStyleAccessEnabled = true;
 
-    public void setBucket(String bucket) {
-        this.bucket = bucket;
-    }
+    public String getBucket() { return bucket; }
+    public void setBucket(String bucket) { this.bucket = bucket; }
+
+    public String getPublicEndpoint() { return publicEndpoint; }
+    public void setPublicEndpoint(String v) { this.publicEndpoint = v; }
+
+    public boolean isPathStyleAccessEnabled() { return pathStyleAccessEnabled; }
+    public void setPathStyleAccessEnabled(boolean v) { this.pathStyleAccessEnabled = v; }
 }

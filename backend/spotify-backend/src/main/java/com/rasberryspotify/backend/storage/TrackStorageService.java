@@ -1,48 +1,78 @@
 package com.rasberryspotify.backend.storage;
 
-import io.awspring.cloud.s3.S3Template;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
+import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.time.Duration;
-import java.util.UUID;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class TrackStorageService {
 
-    private final S3Template s3Template;
-    private final com.rasberryspotify.backend.storage.StorageProperties properties;
+    private final S3Client s3Client;
+    private final S3Presigner s3Presigner;
 
-    public TrackStorageService(S3Template s3Template, com.rasberryspotify.backend.storage.StorageProperties properties) {
-        this.s3Template = s3Template;
-        this.properties = properties;
-    }
+     private final Set<String> knownBuckets = ConcurrentHashMap.newKeySet();
 
+    public void ensureBucketExists(String bucket) {
+        if (knownBuckets.contains(bucket)) return;
 
-    public String upload(MultipartFile file, UUID trackId) throws IOException {
-        String key = "tracks/" + trackId + "/original" + extension(file.getOriginalFilename());
-        try (InputStream in = file.getInputStream()) {
-            s3Template.upload(properties.getBucket(), key, in);
+        try {
+            s3Client.headBucket(HeadBucketRequest.builder().bucket(bucket).build());
+        } catch (S3Exception e) {
+            if (e.statusCode() != 404) {
+                // Не 404 — реальная ошибка (403, 5xx). Не глотаем.
+                throw e;
+            }
+            try {
+                s3Client.createBucket(CreateBucketRequest.builder().bucket(bucket).build());
+                log.info("Created bucket: {}", bucket);
+            } catch (S3Exception ce) {
+                // 409 или BucketAlreadyOwnedByYou — параллельный create, это ок
+                String code = ce.awsErrorDetails() != null
+                        ? ce.awsErrorDetails().errorCode() : null;
+                if (ce.statusCode() != 409 && !"BucketAlreadyOwnedByYou".equals(code)) {
+                    throw ce;
+                }
+            }
         }
-        return key;
+        knownBuckets.add(bucket);
     }
 
-    public URL generatePresignedUrl(String key, Duration ttl) {
-        return s3Template.createSignedGetURL(properties.getBucket(), key, ttl);
+     public URL presignPut(String bucket, String key, Duration ttl) {
+        ensureBucketExists(bucket);
+        var req = PutObjectPresignRequest.builder()
+                .signatureDuration(ttl)
+                .putObjectRequest(b -> b.bucket(bucket).key(key))
+                .build();
+        return s3Presigner.presignPutObject(req).url();
     }
 
-    public void delete(String key) {
-        s3Template.deleteObject(properties.getBucket(), key);
+     public URL presignGet(String bucket, String key, Duration ttl) {
+        var req = GetObjectPresignRequest.builder()
+                .signatureDuration(ttl)
+                .getObjectRequest(b -> b.bucket(bucket).key(key))
+                .build();
+        return s3Presigner.presignGetObject(req).url();
     }
 
-    private String extension(String filename) {
-        if (filename == null) return "";
-        int dot = filename.lastIndexOf('.');
-        return dot >= 0 ? filename.substring(dot) : "";
+    public void delete(String bucket, String key) {
+        s3Client.deleteObject(b -> b.bucket(bucket).key(key));
+    }
+
+    public void evictFromCache(String bucket) {
+        knownBuckets.remove(bucket);
     }
 }
-
-

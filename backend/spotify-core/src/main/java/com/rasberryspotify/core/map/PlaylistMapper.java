@@ -11,7 +11,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-        uses = { UserMapper.class })
+        uses = { UserMapper.class, PlaylistTrackMapper.class })
 public interface PlaylistMapper {
     PlaylistResponse toResponse(Playlist playlist);
     List<PlaylistResponse> toResponses(List<Playlist> playlists);
